@@ -46,29 +46,24 @@ userRouter.post("/signup",async(req,res)=>{
 });
 
    
-userRouter.post("/signin",async(req,res)=>{
-    const {email,password,firstName,lastName} = req.body;
+userRouter.post("/signin", async (req, res) => {
+    const { email, password } = req.body;
 
-    const response = await usersModel.findOne({
-        email: email
-    });
-    if(!response){
-        res.status(403).json({
-            message:"invalid user"
-        })
+    const response = await usersModel.findOne({ email });
+    if (!response) {
+        return res.status(403).json({
+            message: "invalid user"
+        });
     }
-    const passwordMatch = bcrypt.compare(password,response.password);
-    if (passwordMatch){
-        const token = jwt.sign({
-            id : response._id.toString()
-        },JWT_USER_PASSWORD );
-        res.json({
-            token 
-        })
-    }else{
+
+    const passwordMatch = await bcrypt.compare(password, response.password);
+    if (passwordMatch) {
+        const token = jwt.sign({ id: response._id.toString() }, JWT_USER_PASSWORD);
+        res.json({ token });
+    } else {
         res.status(403).json({
-            message : "Invalid credentials"
-        })
+            message: "Invalid credentials"
+        });
     }
 });
 
